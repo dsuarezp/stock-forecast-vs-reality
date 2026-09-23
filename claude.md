@@ -123,10 +123,13 @@ Rules for both:
 
 ## Environment and execution
 
-* Do not run `pip install`, `uv add`, or any command that installs or upgrades
-  dependencies. When a new dependency is needed, add it to the project's
-  dependency file and tell the user what to install; the user runs the
-  installation themselves.
+* Installing or syncing dependencies (`pip install`, `uv add`, `uv sync`, etc.)
+  is allowed, but only inside this project's own virtual environment
+  (`.venv`) — never into the system/global Python. If `.venv` does not exist
+  yet, create it first before installing anything into it.
+* Still declare dependencies in the project's dependency file
+  (`pyproject.toml`) rather than installing them ad hoc outside of it, so the
+  dependency list and the environment stay in sync.
 * The project's own entry points run with no command-line arguments or flags.
   Invoke scripts as plain `python main.py`, never `python main.py --something`.
 * Everything a script needs (parameters, options, switches, paths) comes from the
