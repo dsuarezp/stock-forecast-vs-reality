@@ -52,9 +52,11 @@ running locally before any deployment concerns are introduced.
 ## Phases / milestones
 
 - [x] **Phase 0 — Repo scaffolding.** Conventions (`claude.md`), `README.md`,
-      `PROJECT_GUIDE.md`, `.gitignore`, and local Python environment.
-- [ ] **Phase 1 — Data ingestion.** Fetch and store daily closing prices for
-      AAPL over a configurable period.
+      `PROJECT_GUIDE.md`, `.gitignore`, `pyproject.toml` (dependencies managed
+      with `uv`), and local Python environment.
+- [x] **Phase 1 — Data ingestion.** Fetch and store daily closing prices for
+      AAPL over a configurable period. Implemented in `ingest/`, verified
+      against real Yahoo Finance data.
 - [ ] **Phase 2 — Expected-range model.** Produce a daily band of expected
       movement from historical data. Methodology is an open decision.
 - [ ] **Phase 3 — Breakout detection.** Compare real closes against the band
@@ -63,6 +65,23 @@ running locally before any deployment concerns are introduced.
       news and generate a confidence-scored, correlation-only explanation.
 - [ ] **Phase 5 — Visualization.** Timeline chart with the band, the real
       price, highlighted breakouts, and click-to-explain.
+
+## Decisions made
+
+* **Price data source (Phase 1): `yfinance`.** Free, no API key, returns a
+  pandas DataFrame directly. Trade-off accepted: it wraps unofficial Yahoo
+  Finance endpoints, so it can break without notice — acceptable for a local
+  learning project without an uptime SLA.
+* **Dependency management: `pyproject.toml` + `uv`.** Chosen with the stated
+  goal of eventually deploying this to the cloud in mind: `uv.lock` pins exact
+  versions, so the environment tested locally matches what a container would
+  run. Also keeps the toolchain consistent with Ruff (same maintainer,
+  Astral). Trade-off accepted: one more tool to install beyond pip.
+* **Folder layout: one flat folder per phase, no numeric prefixes**
+  (`ingest/`, not `01_ingest/`), because a leading digit makes a folder
+  invalid as a Python package name. Phases do not import from each other;
+  they communicate through files written to `data/`, keeping each phase
+  runnable as a standalone script.
 
 ## Open decisions (to resolve before implementing, not by default)
 
@@ -82,4 +101,16 @@ running locally before any deployment concerns are introduced.
 
 * 2026-09-23 — Repo initialized. Conventions defined in `claude.md`. Overall
   project scope and phased plan agreed upon. `README.md` and this guide
-  created. Local Python virtual environment set up next.
+  created.
+* 2026-09-23 — Dependency management set up (`pyproject.toml` + `uv`).
+  Phase 1 ingestion script written (`ingest/fetch_prices.py`), reading
+  ticker/lookback from `config/config.yaml`. Dependencies were installed with
+  `pip` directly into `.venv` rather than `uv sync`, so `uv.lock` does not
+  exist yet — running `uv sync` once is still needed to get the pinned
+  lockfile this setup was chosen for.
+* 2026-09-23 — Verified the ingestion script against real Yahoo Finance data.
+  Found and fixed two real issues along the way: `yfinance` returns
+  MultiIndex columns even for a single ticker (was corrupting the CSV
+  header), and the most recent day can come back with a null close before
+  it settles. Both are covered by a regression test in
+  `ingest/test_fetch_prices.py`.
