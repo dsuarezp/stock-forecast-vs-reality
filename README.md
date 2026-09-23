@@ -36,12 +36,18 @@ and current progress.
 
 ## Setup
 
-Requires Python 3.12+.
+Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/) for dependency
+management.
 
 ```bash
-python -m venv .venv
-.venv\Scripts\Activate.ps1   # Windows PowerShell
+uv sync
 ```
 
-Dependencies and run instructions will be added here as each pipeline phase
-lands.
+This creates a local `.venv` and installs all dependencies pinned in
+`uv.lock`. Run any script with `uv run`, e.g.:
+
+```bash
+uv run python ingest/fetch_prices.py
+```
+
+Run instructions for later phases will be added here as they land.
