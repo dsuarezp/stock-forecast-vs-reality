@@ -1,0 +1,3 @@
+ingest:
+  ticker: AAPL
+  lookback_days: 180
