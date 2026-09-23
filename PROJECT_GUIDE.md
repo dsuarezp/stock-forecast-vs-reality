@@ -65,8 +65,12 @@ running locally before any deployment concerns are introduced.
       breakout relative to that day's band width for later use by the agent.
 - [ ] **Phase 4 — Explanation agent.** On breakout days, retrieve same-day
       news and generate a confidence-scored, correlation-only explanation.
-- [ ] **Phase 5 — Visualization.** Timeline chart with the band, the real
-      price, highlighted breakouts, and click-to-explain.
+      Built out of order, after Phase 5 (see progress log) — the UI's
+      explanation endpoint currently returns placeholder text pending this.
+- [x] **Phase 5 — Visualization.** Timeline chart with the band, the real
+      price, highlighted breakouts, and click-to-explain. Implemented in
+      `ui/` (FastAPI backend + plain HTML/CSS/JS frontend), verified working
+      by the user in a browser.
 
 ## Decisions made
 
@@ -94,6 +98,21 @@ running locally before any deployment concerns are introduced.
   from a rolling window of recent residuals (`calibration_window_days` in
   config) instead of a single fixed calibration split, so it adapts to
   changing volatility instead of relying on a static assumption.
+* **Visualization approach (Phase 5): FastAPI backend + plain HTML/CSS/JS
+  frontend** (Plotly.js via CDN for the chart), not React and not
+  Streamlit/Dash. Chosen because the project's stated end goal is deploying
+  this to the cloud eventually — a small API-backed web app is deployable as-
+  is, unlike a PySide6 desktop app, and gives full CSS control (the "bonito y
+  personalizable" requirement) without a second build toolchain (Node/JSX)
+  that the UI's current scope (one chart, one detail panel) doesn't need.
+  React remains a reasonable future move if the UI grows enough client-side
+  state to justify it.
+* **Phase ordering: built Phase 5 before Phase 4.** The agent (Phase 4) is
+  the most complex remaining piece; visualizing the pipeline's output first
+  gives an earlier, motivating checkpoint. The explanation endpoint
+  (`/api/explain/{day}`) is already wired into the UI and returns placeholder
+  text — Phase 4 only needs to replace that placeholder logic in `ui/app.py`,
+  no UI changes required.
 
 ## Open decisions (to resolve before implementing, not by default)
 
@@ -102,8 +121,6 @@ running locally before any deployment concerns are introduced.
 * **Agent orchestration** (Phase 4): direct LLM API calls vs. an
   agent/orchestration framework — to be decided based on actual need, not by
   default.
-* **Visualization approach** (Phase 5): local plotting library vs. a small
-  web UI — to be decided once Phases 1-4 produce real data to visualize.
 
 ## Progress log
 
@@ -133,3 +150,11 @@ running locally before any deployment concerns are introduced.
   (`relative_deviation`), so Phase 4 can use it as a confidence signal.
   Confirms the same 6 breakouts found during Phase 2's manual check, now
   produced by the pipeline itself.
+* 2026-09-23 — Implemented and verified Phase 5 (`ui/`), out of order and
+  ahead of Phase 4: a FastAPI backend (`ui/app.py`) serving `/api/prices` and
+  a placeholder `/api/explain/{day}`, plus a plain HTML/CSS/JS frontend
+  (`ui/static/`) rendering the band, price line, and breakout markers with
+  Plotly.js, and a click-to-explain panel. Colors follow the project's
+  dataviz-skill palette (categorical slots 1/2/3, fixed order, pre-validated
+  for color-vision deficiency). User confirmed it renders and works correctly
+  in a browser.
