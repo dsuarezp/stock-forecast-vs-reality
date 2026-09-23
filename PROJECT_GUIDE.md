@@ -104,10 +104,9 @@ running locally before any deployment concerns are introduced.
   created.
 * 2026-09-23 — Dependency management set up (`pyproject.toml` + `uv`).
   Phase 1 ingestion script written (`ingest/fetch_prices.py`), reading
-  ticker/lookback from `config/config.yaml`. Dependencies were installed with
-  `pip` directly into `.venv` rather than `uv sync`, so `uv.lock` does not
-  exist yet — running `uv sync` once is still needed to get the pinned
-  lockfile this setup was chosen for.
+  ticker/lookback from `config/config.yaml`. Dependencies were first
+  installed with `pip` directly into `.venv`, then reconciled with
+  `uv sync`, which generated `uv.lock` for reproducible installs.
 * 2026-09-23 — Verified the ingestion script against real Yahoo Finance data.
   Found and fixed two real issues along the way: `yfinance` returns
   MultiIndex columns even for a single ticker (was corrupting the CSV
