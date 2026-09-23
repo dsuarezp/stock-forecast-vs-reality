@@ -57,8 +57,9 @@ running locally before any deployment concerns are introduced.
 - [x] **Phase 1 — Data ingestion.** Fetch and store daily closing prices for
       AAPL over a configurable period. Implemented in `ingest/`, verified
       against real Yahoo Finance data.
-- [ ] **Phase 2 — Expected-range model.** Produce a daily band of expected
-      movement from historical data. Methodology is an open decision.
+- [x] **Phase 2 — Expected-range model.** Produce a daily band of expected
+      movement from historical data. Implemented in `band/` using rolling
+      conformal prediction, verified against real AAPL data.
 - [ ] **Phase 3 — Breakout detection.** Compare real closes against the band
       and flag breakout days.
 - [ ] **Phase 4 — Explanation agent.** On breakout days, retrieve same-day
@@ -83,12 +84,18 @@ running locally before any deployment concerns are introduced.
   they communicate through files written to `data/`, keeping each phase
   runnable as a standalone script.
 
+* **Band methodology (Phase 2): rolling conformal prediction** around a naive
+  random-walk forecast (tomorrow's close = today's close). Chosen for its
+  formal coverage guarantee and because it fits the "range, not point"
+  principle directly. Trade-off accepted: classic split conformal assumes
+  exchangeable errors, which daily stock returns are not (volatility
+  clustering, regime changes) — mitigated by recalibrating the band every day
+  from a rolling window of recent residuals (`calibration_window_days` in
+  config) instead of a single fixed calibration split, so it adapts to
+  changing volatility instead of relying on a static assumption.
+
 ## Open decisions (to resolve before implementing, not by default)
 
-* **Band methodology** (Phase 2): historical volatility bands (e.g.
-  Bollinger-style), GARCH-based conditional volatility, quantile regression,
-  conformal prediction, or another approach. Each has different statistical
-  guarantees and implementation complexity.
 * **News source** (Phase 4): which API/provider for same-day company news,
   and how to handle its cost/rate limits as a secret-backed config value.
 * **Agent orchestration** (Phase 4): direct LLM API calls vs. an
@@ -113,3 +120,9 @@ running locally before any deployment concerns are introduced.
   header), and the most recent day can come back with a null close before
   it settles. Both are covered by a regression test in
   `ingest/test_fetch_prices.py`.
+* 2026-09-23 — Implemented and verified Phase 2 (`band/build_band.py`): a
+  rolling conformal-prediction band around a naive forecast, configured via
+  `band.coverage` and `band.calibration_window_days`. Empirical coverage on
+  the current AAPL data (91 days after the calibration warm-up) was 93.4%
+  against a configured 90% target, with 6 breakout days identified — the
+  input the Phase 4 agent will consume.
