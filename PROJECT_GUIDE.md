@@ -60,8 +60,9 @@ running locally before any deployment concerns are introduced.
 - [x] **Phase 2 — Expected-range model.** Produce a daily band of expected
       movement from historical data. Implemented in `band/` using rolling
       conformal prediction, verified against real AAPL data.
-- [ ] **Phase 3 — Breakout detection.** Compare real closes against the band
-      and flag breakout days.
+- [x] **Phase 3 — Breakout detection.** Compare real closes against the band
+      and flag breakout days. Implemented in `breakout/`, also sizes each
+      breakout relative to that day's band width for later use by the agent.
 - [ ] **Phase 4 — Explanation agent.** On breakout days, retrieve same-day
       news and generate a confidence-scored, correlation-only explanation.
 - [ ] **Phase 5 — Visualization.** Timeline chart with the band, the real
@@ -126,3 +127,9 @@ running locally before any deployment concerns are introduced.
   the current AAPL data (91 days after the calibration warm-up) was 93.4%
   against a configured 90% target, with 6 breakout days identified — the
   input the Phase 4 agent will consume.
+* 2026-09-23 — Implemented and verified Phase 3 (`breakout/detect_breakouts.py`):
+  flags each day as "above"/"below"/"within" its band and sizes the
+  deviation both in price units and relative to that day's band half-width
+  (`relative_deviation`), so Phase 4 can use it as a confidence signal.
+  Confirms the same 6 breakouts found during Phase 2's manual check, now
+  produced by the pipeline itself.
