@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Forecast vs Reality</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2/plotly.min.js"></script>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <h1>Stock Forecast vs Reality</h1>
+      <p class="subtitle">
+        AAPL daily close vs. its expected range. Shaded band = what a naive
+        forecast, calibrated with conformal prediction, considered normal.
+        Colored points are breakouts &mdash; click one for details.
+      </p>
+    </header>
+
+    <section class="chart-card">
+      <div id="chart"></div>
+    </section>
+
+    <section id="explanation-panel" class="explanation-panel" hidden>
+      <div class="explanation-header">
+        <span id="explanation-date" class="explanation-date"></span>
+        <span id="explanation-direction" class="badge"></span>
+      </div>
+      <dl class="explanation-stats">
+        <div>
+          <dt>Expected range</dt>
+          <dd id="explanation-range"></dd>
+        </div>
+        <div>
+          <dt>Actual close</dt>
+          <dd id="explanation-close"></dd>
+        </div>
+        <div>
+          <dt>Deviation</dt>
+          <dd id="explanation-deviation"></dd>
+        </div>
+      </dl>
+      <p id="explanation-text" class="explanation-text"></p>
+    </section>
+
+    <p id="explanation-placeholder" class="explanation-placeholder">
+      Click a highlighted point on the chart to see what happened that day.
+    </p>
+
+    <details class="data-table-toggle">
+      <summary>View underlying data as a table</summary>
+      <div class="table-wrap">
+        <table id="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Close</th>
+              <th>Expected range</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
