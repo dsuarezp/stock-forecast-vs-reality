@@ -147,8 +147,13 @@ Rules for both:
 
   Example:
   `feat(ingest): add yfinance daily price loader`
-* After completing a working unit of work, commit and push it. Do not combine an
-  entire project phase into one large commit.
+* Push immediately after every commit (`git push`), one commit at a time. Do
+  not batch several commits before pushing, whether by count, by time elapsed,
+  or by waiting for a whole project phase to finish — each commit is already
+  a small, verified, logical change, so it is safe (and preferable) to make it
+  visible on the remote right away rather than leaving it local only.
+* If a push cannot complete cleanly (e.g. the remote has diverged), stop and
+  ask instead of force-pushing or rewriting history to make it succeed.
 * Do not use source-code comments as a change log. Git commits and diffs are the
   source of truth for previous versions and implementation changes.
 * Never commit secrets, local configuration files, raw data, generated binaries,
